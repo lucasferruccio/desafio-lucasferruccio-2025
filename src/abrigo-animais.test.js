@@ -92,7 +92,7 @@ describe("Casos Extras", () => {
     expect(adotadosPessoa1.length).toBeLessThanOrEqual(3);
   });
 
-  test("Jabuti (Loco) não exige ordem, só companhia", () => {
+  test("Loco não exige ordem, só companhia", () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       "RATO,BOLA,SKATE",
       "LASER",
@@ -102,7 +102,7 @@ describe("Casos Extras", () => {
     expect(resultado.lista[1]).toBe("Rex - pessoa 1");
   });
 
-  test("Jabuti (Loco) fica no abrigo se não tiver companhia", () => {
+  test("Loco fica no abrigo se não tiver companhia", () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       "SKATE,RATO",
       "BOLA",
@@ -129,7 +129,7 @@ describe("Casos Extras", () => {
     expect(resultado.lista[0]).toBe("Rex - abrigo");
   });
 
-  test("Validar se o Loco não pode ser selecionado duas vezes.", () => {
+  test("O Loco não pode ser adotado pelas as duas pessoas", () => {
     const resultado = new AbrigoAnimais().encontraPessoas(
       "RATO,BOLA,SKATE",
       "BOLA,LASER,RATO,SKATE",
