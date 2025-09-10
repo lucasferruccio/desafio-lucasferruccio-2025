@@ -1,21 +1,3 @@
-/*
-REGRAS PARA REUNIR PESSOA COM ANIMAIS
-- O animal vai para a pessoa que mostrar todos seus brinquedos favoritos na ordem desejada OK
-- Uma pessoa pode intercalar brinquedos que o animal queira ou não, desde que estejam na ordem desejada OK
-- Gatos não dividem seus brinquedos Ok
-- Se ambas as pessoas tiverem condições de adoção, ninguém fica com o animal (tadinho)
-- Uma pessoa não pode levar mais de três animais para casa ok
-- Loco não se importa com a ordem dos seus brinquedos desde que tenha outro animal como companhia
-
-ENTRADAS E SAÍDAS
-- O programa deve receber três parâmetros de texto: os brinquedos da primeira pessoa, os da segunda pessoa e a ordem em que os animais deve ser considerados
-- Cada um desses parâmetros deve conter os itens separados por vírgula
-- O programa deve retornar uma estrutura contendo a lista em ordem alfabética dos animais e com quem ficaram ou a mensagem de erro, se houver
-- O formato de saída deve ser "nome animal - pessoa número" ou "nome animal - abrigo"
-- Caso animal seja inválido ou duplicado, apresentar erro "Animal inválido" Ok
-- Caso brinquedo seja inválido ou duplicado, apresentar erro "Brinquedo inválido" Ok
-*/
-
 class AbrigoAnimais {
   static dadosAnimais = {
     Rex: { tipo: "cão", brinquedos: ["RATO", "BOLA"] },
@@ -54,19 +36,28 @@ class AbrigoAnimais {
     return dictBrinquedos;
   }
 
+  validarPessoa(animalInstancia, qtdPessoa, numPessoa, brinquedos) {
+    if (qtdPessoa <= 3) {
+      if (animalInstancia.tipo === "jabuti") {
+        if (qtdPessoa > 0) {
+          return animalInstancia.checarCompatibilidade(brinquedos, numPessoa);
+        }
+      } else {
+        return animalInstancia.checarCompatibilidade(brinquedos, numPessoa);
+      }
+    }
+    return brinquedos;
+  }
+
   encontraPessoas(brinquedosPessoa1, brinquedosPessoa2, ordemAnimais) {
     let qtdPessoa1 = 0;
     let qtdPessoa2 = 0;
     let dictPessoa1 = new Map();
     let dictPessoa2 = new Map();
-    let arrayAuxiliar = [];
 
     try {
       dictPessoa1 = this.tratarBrinquedos(brinquedosPessoa1);
       dictPessoa2 = this.tratarBrinquedos(brinquedosPessoa2);
-
-      console.log(dictPessoa1);
-      console.log(dictPessoa2);
     } catch (e) {
       return { erro: e.message };
     }
@@ -86,23 +77,24 @@ class AbrigoAnimais {
 
         const animalInstancia = new AnimalClasse(
           nomeAnimal,
-          dadosAnimal.brinquedos
+          dadosAnimal.brinquedos,
+          dadosAnimal.tipo
         );
 
         animaisMap.set(nomeAnimal, animalInstancia);
 
-        if (dadosAnimal.tipo === "jabuti") {
-          if (qtdPessoa1 > 0 || qtdPessoa2 > 0) {
-          }
-        }
-
-        if (qtdPessoa1 <= 3) {
-          animalInstancia.checarCompatibilidade(dictPessoa1, 1);
-        }
-
-        if (qtdPessoa2 <= 3) {
-          animalInstancia.checarCompatibilidade(dictPessoa2, 2);
-        }
+        dictPessoa1 = this.validarPessoa(
+          animalInstancia,
+          qtdPessoa1,
+          1,
+          dictPessoa1
+        );
+        dictPessoa2 = this.validarPessoa(
+          animalInstancia,
+          qtdPessoa2,
+          2,
+          dictPessoa2
+        );
 
         if (animalInstancia.responsavel === 1) {
           qtdPessoa1++;
@@ -111,21 +103,35 @@ class AbrigoAnimais {
         if (animalInstancia.responsavel === 2) {
           qtdPessoa2++;
         }
-
-        console.log(animalInstancia);
       } catch (e) {
-        console.log("Erro:" + e.message);
         return { erro: e.message };
       }
     }
+
+    const animaisOrdenados = Array.from(animaisMap.keys()).sort();
+
+    const resultado = [];
+
+    animaisOrdenados.forEach((chave) => {
+      let valorResponsavel = animaisMap.get(chave).responsavel;
+
+      if (valorResponsavel !== "abrigo") {
+        resultado.push(`${chave} - pessoa ${valorResponsavel}`);
+      } else {
+        resultado.push(`${chave} - ${valorResponsavel}`);
+      }
+    });
+    console.log(resultado);
+    return { lista: resultado };
   }
 }
 
 class Animal {
-  constructor(nome, brinquedos) {
+  constructor(nome, brinquedos, tipo) {
     this.nome = nome;
     this.brinquedos = brinquedos;
     this.responsavel = "abrigo";
+    this.tipo = tipo;
   }
 }
 
@@ -186,21 +192,26 @@ class Cachorro extends Animal {
 }
 
 class Jabuti extends Animal {
-  checarCompatibilidade(arrayBrinquedo) {}
+  checarCompatibilidade(mapBrinquedo, numPessoa) {
+    const dicAuxiliar = new Map(mapBrinquedo);
+    let contadorAuxiliar = 0;
+
+    for (const brinquedoNecessario of this.brinquedos) {
+      if (mapBrinquedo.has(brinquedoNecessario)) {
+        contadorAuxiliar++;
+        dicAuxiliar.set(brinquedoNecessario, "jabuti");
+      }
+    }
+
+    if (contadorAuxiliar === this.brinquedos.length) {
+      this.responsavel = this.responsavel === "abrigo" ? numPessoa : "abrigo";
+      return dicAuxiliar;
+    }
+
+    return mapBrinquedo;
+  }
 }
 
 const tiposDeAnimais = { cão: Cachorro, gato: Gato, jabuti: Jabuti };
 
 export { AbrigoAnimais as AbrigoAnimais };
-console.log(
-  new AbrigoAnimais().encontraPessoas(
-    "BOLA,LASER",
-    "BOLA,NOVELO,RATO,LASER",
-    "Mimi,Fofo,Rex,Bola"
-  )
-);
-new AbrigoAnimais().encontraPessoas(
-  "BOLA,LASER",
-  "BOLA,NOVELO,RATO,LASER",
-  "Mimi,Fofo,Rex,Bola"
-);
