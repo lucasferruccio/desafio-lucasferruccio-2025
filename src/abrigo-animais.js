@@ -121,7 +121,6 @@ class AbrigoAnimais {
         resultado.push(`${chave} - ${valorResponsavel}`);
       }
     });
-    console.log(resultado);
     return { lista: resultado };
   }
 }
@@ -204,10 +203,13 @@ class Jabuti extends Animal {
     }
 
     if (contadorAuxiliar === this.brinquedos.length) {
-      this.responsavel = this.responsavel === "abrigo" ? numPessoa : "abrigo";
-      return dicAuxiliar;
+      if (this.responsavel === "abrigo") {
+        this.responsavel = numPessoa;
+        return dicAuxiliar;
+      } else {
+        this.responsavel = "abrigo";
+      }
     }
-
     return mapBrinquedo;
   }
 }
