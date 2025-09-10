@@ -128,4 +128,15 @@ describe("Casos Extras", () => {
     );
     expect(resultado.lista[0]).toBe("Rex - abrigo");
   });
+
+  test("Validar se o Loco não pode ser selecionado duas vezes.", () => {
+    const resultado = new AbrigoAnimais().encontraPessoas(
+      "RATO,BOLA,SKATE",
+      "BOLA,LASER,RATO,SKATE",
+      "Rex,Mimi,Loco"
+    );
+    expect(resultado.lista[0]).toBe("Loco - abrigo");
+    expect(resultado.lista[1]).toBe("Mimi - pessoa 2");
+    expect(resultado.lista[2]).toBe("Rex - pessoa 1");
+  });
 });
